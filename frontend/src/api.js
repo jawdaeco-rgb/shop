@@ -89,6 +89,25 @@ export function deleteProduct(id) {
   return request(`/products/${id}`, { method: 'DELETE' });
 }
 
+export async function uploadImage(file) {
+  const token = getToken();
+  const formData = new FormData();
+  formData.append('image', file);
+  const res = await fetch(`${API}/upload`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${token}` },
+    body: formData
+  });
+  const data = await res.json();
+  if (!res.ok) throw new Error(data.error || 'Upload failed');
+  return data.url;
+}
+
+export async function uploadBase64(dataUrl) {
+  const data = await request('/upload-base64', { method: 'POST', body: JSON.stringify({ data: dataUrl }) });
+  return data.url;
+}
+
 export function createCategory(data) {
   return request('/products/categories', { method: 'POST', body: JSON.stringify(data) });
 }

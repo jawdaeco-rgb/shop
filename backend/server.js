@@ -1,22 +1,58 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
+const multer = require('multer');
 const { getDb, all, run } = require('./database');
-const { router: authRouter } = require('./routes/auth');
+const { router: authRouter, authMiddleware } = require('./routes/auth');
 const productsRouter = require('./routes/products');
 const cartRouter = require('./routes/cart');
 const ordersRouter = require('./routes/orders');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
+const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, 'uploads');
+
+if (!fs.existsSync(UPLOAD_DIR)) fs.mkdirSync(UPLOAD_DIR, { recursive: true });
+
+const storage = multer.diskStorage({
+  destination: UPLOAD_DIR,
+  filename: (req, file, cb) => {
+    const ext = path.extname(file.originalname);
+    cb(null, Date.now() + '-' + Math.round(Math.random() * 1E9) + ext);
+  }
+});
+const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
 
 app.use(cors());
-app.use(express.json());
+app.use(express.json({ limit: '10mb' }));
 
 app.use('/api/auth', authRouter);
 app.use('/api/products', productsRouter);
 app.use('/api/cart', cartRouter);
 app.use('/api/orders', ordersRouter);
+
+app.post('/api/upload', authMiddleware, (req, res, next) => {
+  if (!req.user?.isAdmin) return res.status(403).json({ error: 'Admin only' });
+  next();
+}, upload.single('image'), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: 'No file uploaded' });
+  res.json({ url: '/uploads/' + req.file.filename });
+});
+
+app.post('/api/upload-base64', authMiddleware, (req, res) => {
+  if (!req.user?.isAdmin) return res.status(403).json({ error: 'Admin only' });
+  const { data } = req.body;
+  if (!data) return res.status(400).json({ error: 'No image data' });
+  const matches = data.match(/^data:image\/(\w+);base64,(.+)$/);
+  if (!matches) return res.status(400).json({ error: 'Invalid image data' });
+  const ext = matches[1] === 'jpeg' ? 'jpg' : matches[1];
+  const filename = Date.now() + '-' + Math.round(Math.random() * 1E9) + '.' + ext;
+  fs.writeFileSync(path.join(UPLOAD_DIR, filename), matches[2], 'base64');
+  res.json({ url: '/uploads/' + filename });
+});
+
+app.use('/uploads', express.static(UPLOAD_DIR));
 
 app.get('/api', (req, res) => {
   res.json({ message: 'مرحباً بكم في متجر الملابس والعطور' });
@@ -25,7 +61,7 @@ app.get('/api', (req, res) => {
 const frontendBuild = path.join(__dirname, 'public');
 app.use(express.static(frontendBuild));
 app.get('*', (req, res) => {
-  if (req.path.startsWith('/api')) return;
+  if (req.path.startsWith('/api') || req.path.startsWith('/uploads')) return;
   res.sendFile(path.join(frontendBuild, 'index.html'));
 });
 

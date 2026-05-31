@@ -1,4 +1,6 @@
 export function getProductImage(product, size = 400) {
+  if (product.image) return product.image;
+  if (product.images && Array.isArray(product.images) && product.images.length > 0 && product.images[0]) return product.images[0];
   const seed = encodeURIComponent(product.name || `product-${product.id}`);
   return `https://picsum.photos/seed/${seed}/${size}/${size}`;
 }

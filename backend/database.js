@@ -50,7 +50,7 @@ async function getDb() {
       descriptionAr TEXT,
       price REAL NOT NULL,
       oldPrice REAL,
-      image TEXT,
+      image TEXT DEFAULT '',
       images TEXT DEFAULT '[]',
       categoryId INTEGER,
       isFeatured INTEGER DEFAULT 0,

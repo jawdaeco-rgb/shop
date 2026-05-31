@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getAllOrders, updateOrderStatus, getProducts, getCategories, createProduct, updateProduct, deleteProduct, createCategory, deleteCategory, WHATSAPP_NUMBER } from '../api';
+import { getAllOrders, updateOrderStatus, getProducts, getCategories, createProduct, updateProduct, deleteProduct, createCategory, deleteCategory, uploadImage, WHATSAPP_NUMBER } from '../api';
+import { getProductImage } from '../utils';
 
 export default function Admin({ user, refreshCart }) {
   const [tab, setTab] = useState('orders');
@@ -9,8 +10,9 @@ export default function Admin({ user, refreshCart }) {
   const [showForm, setShowForm] = useState(false);
   const [editing, setEditing] = useState(null);
   const [newCat, setNewCat] = useState('');
+  const [uploading, setUploading] = useState(false);
 
-  const emptyForm = { name: '', nameAr: '', description: '', descriptionAr: '', price: '', oldPrice: '', categoryId: 1, isFeatured: false, rating: 4.5, inStock: 1 };
+  const emptyForm = { name: '', nameAr: '', description: '', descriptionAr: '', price: '', oldPrice: '', categoryId: 1, isFeatured: false, rating: 4.5, inStock: 1, image: '' };
   const [form, setForm] = useState(emptyForm);
 
   const loadData = () => {
@@ -42,9 +44,24 @@ export default function Admin({ user, refreshCart }) {
       name: p.name, nameAr: p.nameAr, description: p.description || '',
       descriptionAr: p.descriptionAr || '', price: String(p.price),
       oldPrice: p.oldPrice ? String(p.oldPrice) : '', categoryId: p.categoryId,
-      isFeatured: !!p.isFeatured, rating: p.rating, inStock: p.inStock
+      isFeatured: !!p.isFeatured, rating: p.rating, inStock: p.inStock,
+      image: p.image || ''
     });
     setShowForm(true);
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploading(true);
+    try {
+      const url = await uploadImage(file);
+      setForm({ ...form, image: url });
+    } catch (err) {
+      alert('فشل رفع الصورة: ' + err.message);
+    } finally {
+      setUploading(false);
+    }
   };
 
   const handleSave = async () => {
@@ -140,6 +157,17 @@ export default function Admin({ user, refreshCart }) {
                 <div className="form-group"><label>الاسم (عربي)</label><input value={form.nameAr} onChange={e => setForm({...form, nameAr: e.target.value})} /></div>
                 <div className="form-group"><label>السعر</label><input type="number" step="0.01" value={form.price} onChange={e => setForm({...form, price: e.target.value})} /></div>
                 <div className="form-group"><label>السعر القديم (اختياري)</label><input type="number" step="0.01" value={form.oldPrice} onChange={e => setForm({...form, oldPrice: e.target.value})} /></div>
+                <div className="form-group"><label>رابط الصورة (اختياري)</label><input value={form.image} onChange={e => setForm({...form, image: e.target.value})} placeholder="https://..." /></div>
+                <div className="form-group">
+                  <label>أو رفع صورة</label>
+                  <input type="file" accept="image/*" onChange={handleImageUpload} disabled={uploading} />
+                  {uploading && <small>جاري الرفع...</small>}
+                </div>
+                {form.image && (
+                  <div style={{ textAlign: 'center', margin: '10px 0' }}>
+                    <img src={form.image} alt="preview" style={{ maxWidth: 200, maxHeight: 200, borderRadius: 8, border: '2px solid var(--border)' }} />
+                  </div>
+                )}
                 <div className="form-group">
                   <label>التصنيف</label>
                   <select value={form.categoryId} onChange={e => setForm({...form, categoryId: Number(e.target.value)})}>
@@ -157,11 +185,12 @@ export default function Admin({ user, refreshCart }) {
             </div>
           )}
           <table className="admin-table">
-            <thead><tr><th>#</th><th>الاسم</th><th>السعر</th><th>التصنيف</th><th>مميز</th><th>إجراءات</th></tr></thead>
+            <thead><tr><th>#</th><th>الصورة</th><th>الاسم</th><th>السعر</th><th>التصنيف</th><th>مميز</th><th>إجراءات</th></tr></thead>
             <tbody>
               {products.map(p => (
                 <tr key={p.id}>
                   <td>{p.id}</td>
+                  <td><img src={getProductImage(p, 80)} alt={p.nameAr} style={{ width: 50, height: 50, borderRadius: 6, objectFit: 'cover' }} /></td>
                   <td>{p.nameAr}</td>
                   <td>{p.price} د.م.</td>
                   <td>{p.categoryNameAr || p.categoryName}</td>

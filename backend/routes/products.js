@@ -46,20 +46,20 @@ router.get('/categories', (req, res) => {
 });
 
 router.post('/', authMiddleware, adminOnly, (req, res) => {
-  const { name, nameAr, description, descriptionAr, price, oldPrice, categoryId, isFeatured, rating, inStock } = req.body;
+  const { name, nameAr, description, descriptionAr, price, oldPrice, categoryId, isFeatured, rating, inStock, image } = req.body;
   if (!name || !nameAr || !price) return res.status(400).json({ error: 'Name and price required' });
   const r = db.run(
-    'INSERT INTO products (name, nameAr, description, descriptionAr, price, oldPrice, categoryId, isFeatured, rating, inStock) VALUES (?,?,?,?,?,?,?,?,?,?)',
-    [name, nameAr, description || '', descriptionAr || '', price, oldPrice || null, categoryId || 1, isFeatured ? 1 : 0, rating || 4.5, inStock ?? 1]
+    'INSERT INTO products (name, nameAr, description, descriptionAr, price, oldPrice, categoryId, isFeatured, rating, inStock, image) VALUES (?,?,?,?,?,?,?,?,?,?,?)',
+    [name, nameAr, description || '', descriptionAr || '', price, oldPrice || null, categoryId || 1, isFeatured ? 1 : 0, rating || 4.5, inStock ?? 1, image || '']
   );
   res.json({ id: r.lastInsertRowid });
 });
 
 router.put('/:id', authMiddleware, adminOnly, (req, res) => {
-  const { name, nameAr, description, descriptionAr, price, oldPrice, categoryId, isFeatured, rating, inStock } = req.body;
+  const { name, nameAr, description, descriptionAr, price, oldPrice, categoryId, isFeatured, rating, inStock, image } = req.body;
   db.run(
-    'UPDATE products SET name=?, nameAr=?, description=?, descriptionAr=?, price=?, oldPrice=?, categoryId=?, isFeatured=?, rating=?, inStock=? WHERE id=?',
-    [name, nameAr, description, descriptionAr, price, oldPrice, categoryId, isFeatured ? 1 : 0, rating, inStock ?? 1, req.params.id]
+    'UPDATE products SET name=?, nameAr=?, description=?, descriptionAr=?, price=?, oldPrice=?, categoryId=?, isFeatured=?, rating=?, inStock=?, image=? WHERE id=?',
+    [name, nameAr, description, descriptionAr, price, oldPrice, categoryId, isFeatured ? 1 : 0, rating, inStock ?? 1, image || '', req.params.id]
   );
   res.json({ success: true });
 });
