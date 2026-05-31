@@ -42,12 +42,12 @@ export default function Profile({ user, setUser }) {
               {order.items?.map((item, i) => (
                 <div key={i} style={{ display: 'flex', justifyContent: 'space-between', padding: '5px 0' }}>
                   <span>{item.name} × {item.quantity}</span>
-                  <span>{item.price * item.quantity} د.م.</span>
+                  <span>{(item.price * item.quantity).toFixed(2)} د.م.</span>
                 </div>
               ))}
               <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 10, paddingTop: 10, borderTop: '1px solid var(--border)', fontWeight: 700 }}>
                 <span>الإجمالي</span>
-                <span style={{ color: 'var(--primary-dark)' }}>{order.total} د.م.</span>
+                <span style={{ color: 'var(--primary-dark)' }}>{order.total.toFixed(2)} د.م.</span>
               </div>
             </div>
           ))}

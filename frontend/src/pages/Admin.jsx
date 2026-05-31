@@ -98,7 +98,7 @@ export default function Admin({ user, refreshCart }) {
           <thead><tr><th>#</th><th>العميل</th><th>المنتجات</th><th>المجموع</th><th>تاريخ</th><th>الحالة</th><th>واتساب</th></tr></thead>
           <tbody>
             {orders.map(order => {
-              const waMsg = `طلب #${order.id}%0aالعميل: ${order.userName}%0aالجوال: ${order.shippingPhone}%0aالعنوان: ${order.shippingCity} - ${order.shippingAddress}%0a%0aالمنتجات:%0a${order.items?.map(i => `- ${i.name} × ${i.quantity} = ${i.price * i.quantity} د.م.`).join('%0a')}%0a%0aالإجمالي: ${order.total} د.م.%0aالحالة: ${order.status === 'pending' ? 'قيد الانتظار' : order.status === 'shipped' ? 'تم الشحن' : order.status === 'delivered' ? 'تم التوصيل' : 'ملغي'}`;
+              const waMsg = `طلب #${order.id}%0aالعميل: ${order.userName}%0aالجوال: ${order.shippingPhone}%0aالعنوان: ${order.shippingCity} - ${order.shippingAddress}%0a%0aالمنتجات:%0a${order.items?.map(i => `- ${i.name} × ${i.quantity} = ${(i.price * i.quantity).toFixed(2)} د.م.`).join('%0a')}%0a%0aالإجمالي: ${order.total.toFixed(2)} د.م.%0aالحالة: ${order.status === 'pending' ? 'قيد الانتظار' : order.status === 'shipped' ? 'تم الشحن' : order.status === 'delivered' ? 'تم التوصيل' : 'ملغي'}`;
               return (
                 <tr key={order.id}>
                   <td>{order.id}</td>
@@ -106,7 +106,7 @@ export default function Admin({ user, refreshCart }) {
                   <td style={{ fontSize: '0.85rem' }}>
                     {order.items?.map((i, idx) => <div key={idx}>{i.name} × {i.quantity}</div>)}
                   </td>
-                  <td>{order.total} د.م.</td>
+                  <td>{order.total.toFixed(2)} د.م.</td>
                   <td style={{ fontSize: '0.85rem' }}>{new Date(order.createdAt).toLocaleDateString('ar-SA')}</td>
                   <td>
                     <select value={order.status} onChange={e => handleStatus(order.id, e.target.value)}

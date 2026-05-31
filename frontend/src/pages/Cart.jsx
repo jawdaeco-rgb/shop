@@ -53,21 +53,21 @@ export default function Cart({ user, refreshCart }) {
               </div>
               <div className="item-info">
                 <h3>{item.nameAr}</h3>
-                <div className="price">{item.price} د.م.</div>
+                <div className="price">{item.price.toFixed(2)} د.م.</div>
               </div>
               <div className="qty-control">
                 <button onClick={() => handleQty(item.id, item.quantity - 1)}>-</button>
                 <span>{item.quantity}</span>
                 <button onClick={() => handleQty(item.id, item.quantity + 1)}>+</button>
               </div>
-              <div className="item-total">{item.price * item.quantity} د.م.</div>
+              <div className="item-total">{(item.price * item.quantity).toFixed(2)} د.م.</div>
               <button className="remove-btn" onClick={() => handleRemove(item.id)}>🗑️</button>
             </div>
           ))}
           <div className="cart-summary">
-            <div className="row"><span>المجموع</span><span>{total} د.م.</span></div>
+            <div className="row"><span>المجموع</span><span>{total.toFixed(2)} د.م.</span></div>
             <div className="row"><span>الشحن</span><span>مجاني</span></div>
-            <div className="row total"><span>الإجمالي</span><span>{total} د.م.</span></div>
+            <div className="row total"><span>الإجمالي</span><span>{total.toFixed(2)} د.م.</span></div>
             <button className="btn btn-primary" style={{ width: '100%', marginTop: 15 }}
               onClick={() => navigate('/checkout')}>
               إتمام الطلب

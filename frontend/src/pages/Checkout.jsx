@@ -44,7 +44,7 @@ export default function Checkout({ user }) {
   const total = items.reduce((s, i) => s + i.price * i.quantity, 0);
 
   if (orderDone) {
-    const msg = `طلب جديد #${orderId}%0aالعميل: ${form.name}%0aالجوال: ${form.phone}%0aالعنوان: ${form.city} - ${form.address}%0a%0aالمنتجات:%0a${items.map(i => `- ${i.nameAr} × ${i.quantity} = ${i.price * i.quantity} د.م.`).join('%0a')}%0a%0aالإجمالي: ${total} د.م.`;
+    const msg = `طلب جديد #${orderId}%0aالعميل: ${form.name}%0aالجوال: ${form.phone}%0aالعنوان: ${form.city} - ${form.address}%0a%0aالمنتجات:%0a${items.map(i => `- ${i.nameAr} × ${i.quantity} = ${(i.price * i.quantity).toFixed(2)} د.م.`).join('%0a')}%0a%0aالإجمالي: ${total.toFixed(2)} د.م.`;
     return (
       <div className="checkout-page container" style={{ textAlign: 'center', paddingTop: 60 }}>
         <div style={{ fontSize: '4rem', marginBottom: 20 }}>✅</div>
@@ -92,12 +92,12 @@ export default function Checkout({ user }) {
           {items.map(item => (
             <div key={item.id} className="item">
               <span>{item.nameAr} × {item.quantity}</span>
-              <span>{item.price * item.quantity} د.م.</span>
+              <span>{(item.price * item.quantity).toFixed(2)} د.م.</span>
             </div>
           ))}
           <div className="item" style={{ fontWeight: 700, fontSize: '1.1rem', marginTop: 10 }}>
             <span>الإجمالي</span>
-            <span style={{ color: 'var(--primary-dark)' }}>{total} د.م.</span>
+            <span style={{ color: 'var(--primary-dark)' }}>{total.toFixed(2)} د.م.</span>
           </div>
         </div>
       </div>
