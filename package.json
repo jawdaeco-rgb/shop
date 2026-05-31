@@ -1,0 +1,9 @@
+{
+  "name": "arabic-ecommerce",
+  "private": true,
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build && rm -rf ../backend/public && cp -r dist ../backend/public",
+    "start": "cd backend && npm install --omit=dev && node server.js",
+    "seed": "cd backend && node seed.js"
+  }
+}

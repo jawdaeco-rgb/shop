@@ -1,0 +1,16 @@
+{
+  "apps": [
+    {
+      "name": "shop-backend",
+      "script": "server.js",
+      "cwd": "C:\\Users\\YOUSSEF\\Desktop\\موقع لبيع\\backend",
+      "interpreter": "C:\\Program Files\\nodejs\\node.exe"
+    },
+    {
+      "name": "shop-frontend",
+      "script": "node_modules/vite/bin/vite.js",
+      "cwd": "C:\\Users\\YOUSSEF\\Desktop\\موقع لبيع\\frontend",
+      "interpreter": "C:\\Program Files\\nodejs\\node.exe"
+    }
+  ]
+}

@@ -1,0 +1,6 @@
+node_modules/
+backend/public/
+backend/shop.db
+backend/*.log
+frontend/dist/
+*.env
